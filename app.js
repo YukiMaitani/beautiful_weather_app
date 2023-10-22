@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
-import { fetchWeatherData, fetchMockWeatherData } from './weatherAPI.js';
+import { fetchWeatherData, fetchMockWeatherData } from './weather_api.js';
 
 let camera, scene, renderer, font, mesh;
 
