@@ -6,6 +6,10 @@ const state = {
   error: null,
 };
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function getWeatherData(latitude, longitude) {
   const endpoint = `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=minutely,hourly,daily,alerts&appid=${API_KEY}`;
   const response = await fetch(endpoint);
@@ -34,4 +38,21 @@ async function fetchWeatherData(latitude, longitude, updateUI) {
   updateUI(state);
 }
 
-export { fetchWeatherData };
+async function fetchMockWeatherData(ms, updateUI) {
+    state.loading = true;
+    state.data = null;
+    state.error = null;
+    updateUI(state);
+    await sleep(ms); 
+
+    const mockData = {
+        temperature: 25,
+        weather: "Sunny",
+        timezone: "Asia/Tokyo"
+    };
+    state.loading = false;
+    state.data = mockData;
+    updateUI(state);
+}
+
+export { fetchWeatherData, fetchMockWeatherData };
