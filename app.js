@@ -14,7 +14,7 @@ async function init() {
     document.body.appendChild(renderer.domElement);
 
     const loader = new FontLoader();
-    font = await loader.loadAsync('/fonts/merriweather_Italic.json');
+    font = await loader.loadAsync('/fonts/merriweather_italic.json');
 
     camera.position.z = 5;
     const controls = new OrbitControls(camera, renderer.domElement);
