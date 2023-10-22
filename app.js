@@ -23,29 +23,64 @@ async function init() {
 }
 
 function updateUI(state) {
-    if (scene.getObjectByName('textMesh')) {
-        scene.remove(scene.getObjectByName('textMesh'));
-    }
+  if (scene.getObjectByName('textMesh')) {
+      scene.remove(scene.getObjectByName('textMesh'));
+  }
 
-    let text = '';
-    if (state.loading) {
-        text = "Loading...";
-    } else if (state.data) {
-        text = `Temperature: ${state.data.temperature}\nWeather: ${state.data.weather}\nTimezone: ${state.data.timezone}`;
-    } else if (state.error) {
-        text = `Error: ${state.error}`;
-    }
+  if (state.loading || state.error) {
+      let text = state.loading ? "Loading..." : `Error: ${state.error}`;
 
+      const textGeometry = createTextGeometry(text);
+      textGeometry.center();
+      mesh = createTextMesh(textGeometry);
+      mesh.name = 'textMesh';
+
+      scene.add(mesh);
+  } else if (state.data) {
+    const temperatureGeometry = createTextGeometry(`Temperature: ${state.data.temperature}`);
+    temperatureGeometry.computeBoundingBox();
+
+    const weatherGeometry = createTextGeometry(`Weather: ${state.data.weather}`);
+    weatherGeometry.computeBoundingBox();
+
+    const timezoneGeometry = createTextGeometry(`Timezone: ${state.data.timezone}`);
+    timezoneGeometry.computeBoundingBox();
+
+    // Positioning
+    const temperatureMesh = createTextMesh(temperatureGeometry);
+    temperatureMesh.position.copy(getWorldPosition(-0.9, -0.9, -2, camera));
+
+    const weatherMesh = createTextMesh(weatherGeometry);
+    weatherMesh.position.copy(getWorldPosition(-0.9, 0.8, -2, camera));
+
+    const timezoneMesh = createTextMesh(timezoneGeometry);
+    timezoneMesh.position.copy(getWorldPosition(0.3, -0.9, -2, camera));
+
+    scene.add(temperatureMesh, weatherMesh, timezoneMesh);
+  }
+}
+
+function getWorldPosition(x, y, distance, camera) {
+    let vector = new THREE.Vector3(x, y, -1).unproject(camera);
+    let dir = vector.sub(camera.position).normalize();
+    let distanceToPlane = distance / dir.z; 
+    let pos = camera.position.clone().add(dir.multiplyScalar(distanceToPlane));
+    return pos;
+}
+
+function createTextGeometry(text) {
     const textGeometry = new TextGeometry(text, {
         font: font,
-        size: 0.2,
-        height: 0.05,
+        size: 0.15,
+        height: 0.01,
     });
-    const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    mesh = new THREE.Mesh(textGeometry, textMaterial);
-    mesh.name = 'textMesh';
+    return textGeometry;
+}
 
-    scene.add(mesh);
+function createTextMesh(geometry) {
+    const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const mesh = new THREE.Mesh(geometry, textMaterial);
+    return mesh;
 }
 
 async function main() {
